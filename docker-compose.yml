@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  celery-worker:
+    container_name: celery_worker_container
+    build: .
+    command: celery -A tasks.celery_app:celery_app worker -E -l info
+    restart: always
+    depends_on:
+      - redis
+    links:
+      - redis
+
+  celery-beat:
+    container_name: celery_beat_container
+    build: .
+    command: celery -A tasks.celery_app:celery_app beat -l info
+    restart: always
+    depends_on:
+      - redis
+      - celery-worker
+    links:
+      - redis
+      - celery-worker
+
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redisdata:/data
