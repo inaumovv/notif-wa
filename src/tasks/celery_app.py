@@ -77,7 +77,7 @@ celery_app.autodiscover_tasks()
 #                 con.case_manager.new_case(rent_entity)
 
 
-@shared_task(bind=True, default_retry_delay=5, max_retries=10)
+@shared_task(bind=True, default_retry_delay=1, max_retries=10)
 def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=container):
     logger.info(f'{status, quantity}')
     try:
@@ -86,7 +86,7 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
         for entity in data['results']:
             notifications: bool | None = entity.get('notifications', None)
             if not notifications or notifications is True:
-                if entity['client']['phone'] == '+77711699444':
+                if entity['client']['phone'] == '+77088222869':
                     rent_entity: dtos.RentEntity = dtos.RentEntity(
                         id=entity['id'],
                         status=dtos.Status[entity['status_color'].upper()],
@@ -139,7 +139,7 @@ celery_app.conf.beat_schedule = {
         'schedule': timedelta(minutes=1, seconds=10),
         'kwargs': {
             'status': 4,
-            'quantity': 10
+            'quantity': 100
         }
     },
 }

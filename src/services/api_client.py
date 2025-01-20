@@ -54,6 +54,7 @@ class APIClient:
         params: dict = {
             'status': status,
             'pageSize': page_size,
+            'ordering': '-id'
         }
         headers: dict[str, str] = {
             'Authorization': f'Bearer {self.access_token}'

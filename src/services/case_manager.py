@@ -42,14 +42,12 @@ class CaseManager:
     def completed_rent(self, rent_entity: RentEntity) -> None:
         rent_db: dict | None = self.redis.get(rent_entity.id)
         if rent_db:
-            rent_db: RentEntity = RentEntity(**rent_db)
-            if rent_entity.id == rent_db.id:
-                self.redis.delete(rent_entity.id)
-                message_text: str = self.message_text.completed_rent_message()
-                self.message_sender.send_message(
-                    number=rent_entity.client.phone[1:],  # номер телефона без +
-                    message=message_text
-                )
+            self.redis.delete(rent_entity.id)
+            message_text: str = self.message_text.completed_rent_message()
+            self.message_sender.send_message(
+                number=rent_entity.client.phone[1:],  # номер телефона без +
+                message=message_text
+            )
 
     def __send_new_rent_notification(self, rent_entity: RentEntity) -> None:
         self.redis.set(rent_entity.id, rent_entity.json())
