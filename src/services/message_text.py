@@ -31,7 +31,7 @@ class MessageText:
         return (f'Уважаемый {rent_entity.client.name},\n'
                 f'Ваш срок аренды закончился!\n'
                 f'Дата окончания: {time_end}\n'
-                f'Необходимо оплатить: {rent_entity.price}\n'
+                f'Необходимо оплатить: {rent_entity.price}₸\n'
                 f'Номер заказа: {rent_entity.id}\n\n'
                 f'Для оплаты, пожалуйста, свяжитесь с менеджером по номеру +7 (700) 860-23-00')
 
@@ -40,7 +40,7 @@ class MessageText:
         return (f'Уважаемый {rent_entity.client.name},\n'
                 f'Вы просрочили аренду больше чем на сутки.\n'
                 f'Дата окончания: {time_end}\n'
-                f'Необходимо оплатить: {rent_entity.price + rent_entity.penalty}\n'
+                f'Необходимо оплатить: {rent_entity.price + rent_entity.penalty}₸\n'
                 f'Номер заказа: {rent_entity.id}\n\n'
                 f'Для оплаты, пожалуйста, свяжитесь с менеджером по номеру +7 (700) 860-23-00')
 
