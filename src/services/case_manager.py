@@ -99,12 +99,12 @@ class CaseManager:
         self.message_sender.send_message(number=rent_entity.client.phone[1:], message=message_text)
 
     def soon_exceed_rent(self, rent_entity: RentEntity, rent_db: RentEntity) -> None:
-        if rent_db.status != Status.SOON_EXCEED:
+        if rent_db.status != Status.SOON_EXCEED and rent_entity.rent_end > datetime.now(tz=timezone.utc):
             self.__send_soon_exceed_notification(rent_entity)
 
     def __send_soon_exceed_notification(self, rent_entity: RentEntity) -> None:
-        time_difference: timedelta = abs(rent_entity.rent_end - datetime.now(tz=timezone.utc))
-        if time_difference <= timedelta(hours=2):
+        time_difference: timedelta = rent_entity.rent_end - datetime.now(tz=timezone.utc)
+        if time_difference <= timedelta(hours=3):
             rent_entity.status = Status.SOON_EXCEED
             self.redis.set(rent_entity.id, rent_entity.json())
             message_text: str = self.message_text.soon_exceed_rent_message(rent_entity)
