@@ -40,14 +40,16 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
                     'phone': '+79263540858',
                     'name': 'Игорь',
                 },
-                'rent_start': datetime(day=2, month=1, year=2025, tzinfo=timezone.utc),
-                'rent_end': datetime(day=23, month=1, year=2025, hour=10, tzinfo=timezone.utc),
-                'price_discount': 1232,
+                'rent_start': datetime(day=2, month=2, year=2025, tzinfo=timezone.utc),
+                'rent_end': datetime(day=5, month=2, year=2025, hour=10, tzinfo=timezone.utc),
+                'price_discount': 1500,
                 'inventories': [
                     {
+                        'id': 1,
                         'inventory_name': 'Молоток 1'
                     },
                     {
+                        'id': 2,
                         'inventory_name': 'Отвертка 1'
                     },
                 ],
@@ -60,37 +62,41 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
                     'phone': '+79263540858',
                     'name': 'Игорь',
                 },
-                'rent_start': datetime(day=2, month=1, year=2025, tzinfo=timezone.utc),
-                'rent_end': datetime(day=21, month=1, year=2025, hour=17, tzinfo=timezone.utc),
+                'rent_start': datetime(day=2, month=2, year=2025, tzinfo=timezone.utc),
+                'rent_end': datetime(day=5, month=2, year=2025, hour=17, tzinfo=timezone.utc),
                 'price_discount': 1232,
                 'inventories': [
                     {
+                        'id': 3,
                         'inventory_name': 'Молоток 2'
                     },
                     {
+                        'id': 4,
                         'inventory_name': 'Отвертка 2'
                     },
                 ],
                 'time_exceed': False
             }, {
                 'id': 3,
-                'status_color': 'exceed',
+                'status_color': 'completed',
                 'client': {
                     'phone': '+79263540858',
                     'name': 'Игорь',
                 },
-                'rent_start': datetime(day=2, month=1, year=2025, tzinfo=timezone.utc),
-                'rent_end': datetime(day=21, month=1, year=2025, hour=10, tzinfo=timezone.utc),
+                'rent_start': datetime(day=2, month=2, year=2025, tzinfo=timezone.utc),
+                'rent_end': datetime(day=3, month=2, year=2025, hour=15, tzinfo=timezone.utc),
                 'price_discount': 1232,
                 'inventories': [
                     {
+                        'id': 5,
                         'inventory_name': 'Молоток 3'
                     },
                     {
+                        'id': 6,
                         'inventory_name': 'Отвертка 3'
                     },
                 ],
-                'time_exceed': True
+                'time_exceed': False
             },
 
         ]
@@ -99,6 +105,8 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
     for entity in data['results']:
         notifications: bool | None = entity.get('notifications', None)
         if not notifications or notifications is True:
+            rent_days: int = (entity['rent_end'] - entity['rent_start']).days
+            day_price: Decimal = Decimal(entity['price_discount']/rent_days)
             rent_entity: dtos.RentEntity = dtos.RentEntity(
                 id=entity['id'],
                 status=dtos.Status[entity['status_color'].upper()],
@@ -106,7 +114,8 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
                 rent_start=entity['rent_start'],
                 rent_end=entity['rent_end'],
                 price=Decimal(entity['price_discount']),
-                inventories=[dtos.InventoryItem(name=item['inventory_name']) for item in entity['inventories']],
+                day_price=day_price,
+                inventories=[dtos.InventoryItem(id=item['id'], name=item['inventory_name']) for item in entity['inventories']],
                 time_exceed=entity['time_exceed']
 
             )

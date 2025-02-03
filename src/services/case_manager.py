@@ -85,10 +85,8 @@ class CaseManager:
 
     @staticmethod
     def __calculate_penalty(rent_entity: RentEntity) -> Decimal:
-        rent_days: int = (rent_entity.rent_end - rent_entity.rent_start).days
-        one_day_price: Decimal = rent_entity.price / rent_days
         exceed_days: int = (datetime.now(tz=timezone.utc) - rent_entity.rent_end).days
-        penalty: Decimal = (exceed_days * one_day_price).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        penalty: Decimal = (exceed_days * rent_entity.day_price).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
         return penalty
 
     def __send_penalty_notification(self, rent_entity: RentEntity) -> None:
