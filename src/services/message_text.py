@@ -60,7 +60,7 @@ class MessageText:
 
     def completed_rent_message(self) -> str:
         return (f'Оборудование возвращено без повреждений и дефектов.\n'
-                f'Спасибо за выбор нашей компании [PRORENT.kz](https://PRORENT.kz)\n'
+                f'Спасибо за выбор нашей компании PRORENT.kz\n'
                 f'Будем благодарны за оставленный отзыв о нашей работе в 2гис, это помогает нам стать лучше.')
 
     @staticmethod
