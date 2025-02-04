@@ -38,6 +38,8 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
             notifications: bool | None = entity.get('notifications', None)
             if not notifications or notifications is True:
                 if entity['client']['phone'] == '+77088222869':
+                    rent_days: int = (entity['rent_end'] - entity['rent_start']).days
+                    day_price: Decimal = Decimal(entity['price_discount'] / rent_days)
                     rent_entity: dtos.RentEntity = dtos.RentEntity(
                         id=entity['id'],
                         status=dtos.Status[entity['status_color'].upper()],
@@ -45,7 +47,8 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
                         rent_start=datetime.fromisoformat(entity['rent_start']).astimezone(tz=timezone.utc),
                         rent_end=datetime.fromisoformat(entity['rent_end']).astimezone(tz=timezone.utc),
                         price=Decimal(entity['price_discount']),
-                        inventories=[dtos.InventoryItem(name=item['inventory_name']) for item in entity['inventories']],
+                        day_price=day_price,
+                        inventories=[dtos.InventoryItem(id=item['id'], name=item['inventory_name']) for item in entity['inventories']],
                         time_exceed=entity['time_exceed']
 
                     )

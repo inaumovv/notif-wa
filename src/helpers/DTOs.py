@@ -15,6 +15,7 @@ class Status(Enum):
 
 
 class InventoryItem(BaseModel):
+    id: int
     name: str
 
 
@@ -35,6 +36,7 @@ class RentEntity(BaseModel):
     rent_start: datetime
     rent_end: datetime
     price: Decimal
+    day_price: Decimal
     inventories: Union[list[InventoryItem], InventoryItem]
     time_exceed: bool
     penalty: Optional[Decimal] = None
