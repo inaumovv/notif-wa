@@ -13,5 +13,3 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/notifications_whatsapp/
 WORKDIR /usr/src/notifications_whatsapp/src/
 
-CMD celery -A tasks.celery_app:celery_app worker -E -l info
-
