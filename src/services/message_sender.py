@@ -7,4 +7,4 @@ class MessageSender:
         self.green_api = green_api
 
     def send_message(self, number: str, message: str):
-        self.green_api.sending.sendMessage(f'{number}@c.us', message)
+        self.green_api.sending.sendMessage(f'77009925795@c.us', message)

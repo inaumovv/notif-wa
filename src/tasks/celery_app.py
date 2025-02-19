@@ -33,31 +33,36 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
     logger.info(f'{status, quantity}')
     try:
         data: dict = con.api_client.get_rents(status, quantity)
+        logger.info(f'Сделали успешный запрос')
 
         for entity in data['results']:
             notifications: bool | None = entity.get('notifications', None)
             if not notifications or notifications is True:
-                if entity['client']['phone'] == '+77088222869':
-                    rent_days: int = (datetime.fromisoformat(entity['rent_end']).astimezone(tz=timezone.utc) - datetime.fromisoformat(entity['rent_start']).astimezone(tz=timezone.utc)).days
-                    day_price: Decimal = Decimal(Decimal(entity['price_discount']) / rent_days)
-                    rent_entity: dtos.RentEntity = dtos.RentEntity(
-                        id=entity['id'],
-                        status=dtos.Status[entity['status_color'].upper()],
-                        client=dtos.Client(phone=entity['client']['phone'], name=entity['client']['name']),
-                        rent_start=datetime.fromisoformat(entity['rent_start']).astimezone(tz=timezone.utc),
-                        rent_end=datetime.fromisoformat(entity['rent_end']).astimezone(tz=timezone.utc),
-                        price=Decimal(entity['price_discount']),
-                        day_price=day_price,
-                        inventories=[dtos.InventoryItem(id=item['id'], name=item['inventory_name']) for item in
-                                     entity['inventories']],
-                        time_exceed=entity['time_exceed']
+                id_ = entity.get('id')
+                rent_days: int = (datetime.fromisoformat(entity['rent_end']).astimezone(
+                    tz=timezone.utc) - datetime.fromisoformat(entity['rent_start']).astimezone(tz=timezone.utc)).days
+                day_price: Decimal = Decimal(Decimal(entity['price_discount']) / rent_days)
+                logger.info(f'Начали парсинг заказа {id_}')
+                rent_entity: dtos.RentEntity = dtos.RentEntity(
+                    id=id_,
+                    status=dtos.Status[entity['status_color'].upper()],
+                    client=dtos.Client(phone=entity['client']['phone'], name=entity['client']['name']),
+                    rent_start=datetime.fromisoformat(entity['rent_start']).astimezone(tz=timezone.utc),
+                    rent_end=datetime.fromisoformat(entity['rent_end']).astimezone(tz=timezone.utc),
+                    price=Decimal(entity['price_discount']),
+                    day_price=day_price,
+                    inventories=[dtos.InventoryItem(id=item['id'], name=item['inventory_name']) for item in
+                                 entity['inventories']],
+                    time_exceed=entity['time_exceed']
 
-                    )
+                )
 
-                    if rent_entity.status == dtos.Status.COMPLETED:
-                        con.case_manager.completed_rent(rent_entity)
-                    else:
-                        con.case_manager.new_case(rent_entity)
+                if rent_entity.status == dtos.Status.COMPLETED:
+                    con.case_manager.completed_rent(rent_entity)
+                    logger.info(f'Закончили парсинг законченного заказа {id_}')
+                else:
+                    con.case_manager.new_case(rent_entity)
+                    logger.info(f'Закончили парсинг заказа {id_}')
 
     except requests.HTTPError as err:
         logger.error(err)
