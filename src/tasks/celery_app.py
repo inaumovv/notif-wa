@@ -40,13 +40,14 @@ def get_rents(self, status: int = 2, quantity: int = 100, dtos=DTOs, con=contain
             if not notifications or notifications is True:
                 if entity['client']['phone'] == '+77009925795':
                     id_ = entity.get('id')
-                    if not entity['status_color'].upper() == 'COMPLETED':
-                        rent_days: int = (datetime.fromisoformat(entity['rent_end']).astimezone(
-                            tz=timezone.utc) - datetime.fromisoformat(entity['rent_start']).astimezone(
-                            tz=timezone.utc)).days
+                    rent_days: int = (datetime.fromisoformat(entity['rent_end']).astimezone(
+                        tz=timezone.utc) - datetime.fromisoformat(entity['rent_start']).astimezone(
+                        tz=timezone.utc)).days
+                    if rent_days > 0:
                         day_price: Decimal = Decimal(Decimal(entity['price_discount']) / rent_days)
                     else:
-                        day_price: Decimal = Decimal(0)
+                        day_price = Decimal(Decimal(entity['price_discount']))
+
                     logger.info(f'Начали парсинг заказа {id_}')
                     rent_entity: dtos.RentEntity = dtos.RentEntity(
                         id=id_,
